@@ -119,7 +119,7 @@ const addDep = async () => {
       console.log(err);
       return;
     }
-    console.log(result);
+    console.log('Department added.');
   });
   promptInitialApp();
 };
@@ -167,7 +167,7 @@ const addRole = async () => {
       console.log(err);
       return;
     }
-    console.log(result);
+    console.log('Role added');
   });
   promptInitialApp();
 };
@@ -203,7 +203,7 @@ const addEmp = async () => {
       console.log(err);
       return;
     }
-    console.log(result);
+    console.log('Employee added.');
   });
   promptInitialApp();
 };
@@ -233,7 +233,7 @@ const updateRole = async () => {
       console.log(err);
       return;
     }
-    console.log(result);
+    console.log('Employee updated.');
   });
   promptInitialApp();
 };
