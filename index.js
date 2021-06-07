@@ -64,10 +64,11 @@ const departmentsQuery = () => {
     }
     console.table(rows);
   });
+  promptInitialApp();
 };
 
 const rolesQuery = () => {
-  const sql = `SELECT * FROM role
+  const sql = `SELECT role.title, role.salary, department.name FROM role
             LEFT JOIN department
             ON department.id = role.id`;
 
@@ -78,10 +79,15 @@ const rolesQuery = () => {
     }
     console.table(rows);
   });
+  promptInitialApp();
 };
 
 const employeesQuery = () => {
-  const sql = `SELECT * FROM employee`;
+  const sql = `SELECT employee.*, role.title, role.salary, department.name FROM employee
+            LEFT JOIN role
+            ON role.id = employee.role_id
+            LEFT JOIN department
+            ON role.department_id = department.id`;
 
   db.query(sql, (err, rows) => {
     if (err) {
@@ -90,6 +96,7 @@ const employeesQuery = () => {
     }
     console.table(rows);
   });
+  promptInitialApp();
 };
 // run db.query if user chooses to view database
 
@@ -114,9 +121,25 @@ const addDep = async () => {
     }
     console.log(result);
   });
+  promptInitialApp();
 };
 
 const addRole = async () => {
+    const sqlRoles = `SELECT role.id, role.title FROM role
+                LEFT JOIN department
+                ON department.id = role.id`;
+
+    let roleName = [];
+
+    const dbResults = await db.query(sqlRoles, (err, rows) => {
+    // console.log(rows);
+    roleName = rows.map(row => {
+        return row.title;
+    })
+    return rows;
+    });
+
+
   let res = await inquirer.prompt([
     {
       type: "input",
@@ -132,20 +155,11 @@ const addRole = async () => {
       type: "list",
       name: "depName",
       message: "Choose a department",
-      choices: [
-        "1 Management",
-        "2 Development",
-        "3 Maintenance",
-        "4 Marketing",
-      ],
+      choices: roleName,
     },
   ]);
   const sql = `INSERT INTO role (title, salary, department_id)
-                VALUES(?,?,?) 
-                UPDATE role
-                    INNER JOIN
-                department ON role.role_id = department.id
-                `;
+                VALUES(?,?,?)`;
   const params = [res.roleName, res.roleSalary, res.depName];
 
   db.query(sql, params, (err, result) => {
@@ -155,7 +169,9 @@ const addRole = async () => {
     }
     console.log(result);
   });
+  promptInitialApp();
 };
+
 const addEmp = async () => {
   let res = await inquirer.prompt([
     {
@@ -189,14 +205,18 @@ const addEmp = async () => {
     }
     console.log(result);
   });
+  promptInitialApp();
 };
+
 const updateRole = async () => {
+    let employees = db.query(`SELECT * FROM employee`);
+
   let res = await inquirer.prompt([
     {
       type: "list",
       name: "empOptions",
       message: "Choose an employee to update.",
-      choices: [],
+      choices: employees,
     },
     {
       type: "list",
@@ -215,6 +235,7 @@ const updateRole = async () => {
     }
     console.log(result);
   });
+  promptInitialApp();
 };
 
 promptInitialApp();
